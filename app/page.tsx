@@ -5,10 +5,17 @@ import SudokuBoard from '@/components/SudokuBoard';
 import NumberPad from '@/components/NumberPad';
 import GameControls from '@/components/GameControls';
 import Header from '@/components/Header';
+import GameTimer from '@/components/GameTimer';
+import HintSystem from '@/components/HintSystem';
+import DarkModeToggle from '@/components/DarkModeToggle';
+import SaveLoadGame from '@/components/SaveLoadGame';
+import KeyboardNavigation from '@/components/KeyboardNavigation';
+import ScoreBoard from '@/components/ScoreBoard';
+import SoundEffects from '@/components/SoundEffects';
+import DailyChallenge from '@/components/DailyChallenge';
 import { useSudokuStore } from '@/store/sudokuStore';
 
 export default function Home() {
-  const [selectedCell, setSelectedCell] = useState<[number, number] | null>(null);
   const [isClient, setIsClient] = useState(false);
   const { 
     board, 
@@ -18,7 +25,9 @@ export default function Home() {
     newGame, 
     validateBoard, 
     isComplete, 
-    isValid 
+    isValid,
+    selectedCell,
+    selectCell
   } = useSudokuStore();
 
   // This effect runs once on component mount to indicate we're on the client
@@ -30,21 +39,21 @@ export default function Home() {
 
   const handleCellClick = (row: number, col: number) => {
     if (!prefilled[row][col]) {
-      setSelectedCell([row, col]);
+      selectCell(row, col);
     }
   };
 
   const handleNumberClick = (num: number) => {
     if (selectedCell) {
-      const [row, col] = selectedCell;
-      useSudokuStore.getState().setCell(row, col, num);
+      const { row, col } = selectedCell;
+      useSudokuStore.getState().updateCell(row, col, num);
     }
   };
 
   const handleEraseClick = () => {
     if (selectedCell) {
-      const [row, col] = selectedCell;
-      useSudokuStore.getState().setCell(row, col, 0);
+      const { row, col } = selectedCell;
+      useSudokuStore.getState().updateCell(row, col, 0);
     }
   };
 
@@ -54,13 +63,11 @@ export default function Home() {
 
   const handleNewGameClick = () => {
     newGame();
-    setSelectedCell(null);
   };
 
   const handleDifficultyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setDifficulty(e.target.value as 'easy' | 'medium' | 'hard');
     newGame();
-    setSelectedCell(null);
   };
 
   // Show a loading state until client-side code is running
@@ -76,21 +83,31 @@ export default function Home() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <Header />
+    <div className="max-w-4xl mx-auto dark:bg-gray-900 dark:text-white min-h-screen p-4">
+      <div className="flex justify-between items-center">
+        <Header />
+        <div className="flex space-x-2">
+          <DarkModeToggle />
+          <SoundEffects />
+        </div>
+      </div>
       
       <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2">
+          <GameTimer />
           <SudokuBoard 
             board={board} 
             prefilled={prefilled} 
             selectedCell={selectedCell} 
             onCellClick={handleCellClick} 
           />
+          <KeyboardNavigation />
         </div>
         
         <div className="flex flex-col justify-between">
-          <div>
+          <div className="space-y-4">
+            <ScoreBoard />
+            
             <GameControls 
               difficulty={difficulty} 
               onDifficultyChange={handleDifficultyChange}
@@ -98,8 +115,14 @@ export default function Home() {
               onValidateClick={handleValidateClick}
             />
             
+            <DailyChallenge />
+            
+            <SaveLoadGame />
+            
+            <HintSystem />
+            
             {isComplete !== null && (
-              <div className={`validation-message ${isValid ? 'success' : 'error'}`}>
+              <div className={`p-4 rounded-lg ${isValid ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'}`}>
                 {isValid 
                   ? 'Congratulations! You solved the puzzle correctly!' 
                   : 'There are some errors in your solution. Keep trying!'}

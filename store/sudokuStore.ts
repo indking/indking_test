@@ -2,6 +2,11 @@ import { create } from 'zustand';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 
+interface CellPosition {
+  row: number;
+  col: number;
+}
+
 interface SudokuState {
   board: number[][];
   solution: number[][];
@@ -9,11 +14,18 @@ interface SudokuState {
   difficulty: Difficulty;
   isComplete: boolean | null;
   isValid: boolean;
+  selectedCell: CellPosition | null;
+  score: number;
   
   setDifficulty: (difficulty: Difficulty) => void;
   setCell: (row: number, col: number, value: number) => void;
+  updateCell: (row: number, col: number, value: number) => void;
+  selectCell: (row: number, col: number) => void;
   newGame: () => void;
   validateBoard: () => void;
+  saveGame: () => void;
+  loadGame: () => boolean;
+  updateScore: (points: number) => void;
 }
 
 // Helper function to create an empty 9x9 board
@@ -156,6 +168,8 @@ const initialState = {
   difficulty: 'medium' as Difficulty,
   isComplete: null,
   isValid: false,
+  selectedCell: null,
+  score: 0,
 };
 
 export const useSudokuStore = create<SudokuState>((set, get) => {
@@ -172,6 +186,21 @@ export const useSudokuStore = create<SudokuState>((set, get) => {
       set({ board: newBoard, isComplete: null });
     },
     
+    updateCell: (row, col, value) => {
+      const { board, prefilled } = get();
+      
+      // Don't update prefilled cells
+      if (prefilled[row][col]) return;
+      
+      const newBoard = board.map(r => [...r]);
+      newBoard[row][col] = value;
+      set({ board: newBoard, isComplete: null });
+    },
+    
+    selectCell: (row, col) => {
+      set({ selectedCell: { row, col } });
+    },
+    
     newGame: () => {
       const { board, solution, prefilled } = generateSudoku(get().difficulty);
       set({ 
@@ -179,7 +208,9 @@ export const useSudokuStore = create<SudokuState>((set, get) => {
         solution, 
         prefilled,
         isComplete: null,
-        isValid: false
+        isValid: false,
+        selectedCell: null,
+        score: 0
       });
     },
     
@@ -194,7 +225,55 @@ export const useSudokuStore = create<SudokuState>((set, get) => {
         row.every((cell, colIndex) => cell === solution[rowIndex][colIndex])
       );
       
+      // Update score if the solution is correct
+      if (isValid) {
+        const difficultyPoints = {
+          'easy': 100,
+          'medium': 200,
+          'hard': 300
+        };
+        set({ score: get().score + difficultyPoints[get().difficulty] });
+      }
+      
       set({ isComplete, isValid });
+    },
+    
+    saveGame: () => {
+      const { board, solution, prefilled, difficulty, score } = get();
+      const gameState = {
+        board,
+        solution,
+        prefilled,
+        difficulty,
+        score,
+        savedAt: new Date().toISOString()
+      };
+      
+      try {
+        localStorage.setItem('sudokuGameState', JSON.stringify(gameState));
+        return true;
+      } catch (error) {
+        console.error('Failed to save game:', error);
+        return false;
+      }
+    },
+    
+    loadGame: () => {
+      try {
+        const savedState = localStorage.getItem('sudokuGameState');
+        if (!savedState) return false;
+        
+        const { board, solution, prefilled, difficulty, score } = JSON.parse(savedState);
+        set({ board, solution, prefilled, difficulty, score, selectedCell: null, isComplete: null, isValid: false });
+        return true;
+      } catch (error) {
+        console.error('Failed to load game:', error);
+        return false;
+      }
+    },
+    
+    updateScore: (points) => {
+      set({ score: get().score + points });
     }
   };
 });

@@ -1,10 +1,15 @@
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
+interface CellPosition {
+  row: number;
+  col: number;
+}
+
 interface SudokuBoardProps {
   board: number[][];
   prefilled: boolean[][];
-  selectedCell: [number, number] | null;
+  selectedCell: CellPosition | null;
   onCellClick: (row: number, col: number) => void;
 }
 
@@ -31,19 +36,17 @@ export default function SudokuBoard({ board, prefilled, selectedCell, onCellClic
   const isRelatedToSelected = (row: number, col: number) => {
     if (!selectedCell) return false;
     
-    const [selectedRow, selectedCol] = selectedCell;
-    
     // Same row
-    if (row === selectedRow) return true;
+    if (row === selectedCell.row) return true;
     
     // Same column
-    if (col === selectedCol) return true;
+    if (col === selectedCell.col) return true;
     
     // Same 3x3 box
     const boxRow = Math.floor(row / 3);
     const boxCol = Math.floor(col / 3);
-    const selectedBoxRow = Math.floor(selectedRow / 3);
-    const selectedBoxCol = Math.floor(selectedCol / 3);
+    const selectedBoxRow = Math.floor(selectedCell.row / 3);
+    const selectedBoxCol = Math.floor(selectedCell.col / 3);
     
     return boxRow === selectedBoxRow && boxCol === selectedBoxCol;
   };
@@ -52,8 +55,7 @@ export default function SudokuBoard({ board, prefilled, selectedCell, onCellClic
   const hasSameValueAsSelected = (row: number, col: number) => {
     if (!selectedCell) return false;
     
-    const [selectedRow, selectedCol] = selectedCell;
-    const selectedValue = board[selectedRow][selectedCol];
+    const selectedValue = board[selectedCell.row][selectedCell.col];
     
     return selectedValue !== 0 && board[row][col] === selectedValue;
   };
@@ -85,7 +87,7 @@ export default function SudokuBoard({ board, prefilled, selectedCell, onCellClic
                 'sudoku-cell',
                 getBlockClass(rowIndex, colIndex),
                 prefilled[rowIndex][colIndex] && 'prefilled',
-                selectedCell && selectedCell[0] === rowIndex && selectedCell[1] === colIndex && 'selected',
+                selectedCell && selectedCell.row === rowIndex && selectedCell.col === colIndex && 'selected',
                 !prefilled[rowIndex][colIndex] && isRelatedToSelected(rowIndex, colIndex) && 'highlight',
                 !prefilled[rowIndex][colIndex] && hasSameValueAsSelected(rowIndex, colIndex) && 'highlight',
                 isRightBorder && 'right-border',
