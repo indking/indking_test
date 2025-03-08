@@ -2,7 +2,7 @@
 
 A modern Sudoku game with a clean, Perplexity-inspired design and Playwright testing.
 
-![Sudoku Game Screenshot](/public/screenshots/screenshot-2025-03-08T22-10-09-527Z.png)
+![Sudoku Game Screenshot](/public/screenshots/desktop-view.png)
 
 ## Features
 
@@ -16,7 +16,7 @@ A modern Sudoku game with a clean, Perplexity-inspired design and Playwright tes
 - 🌓 Visual separation of 3x3 blocks for better readability
 - 🔢 Number pad for easy input on both desktop and mobile
 
-## Planned Features
+## Implemented Features
 
 - ⏱️ Game timer to track solving speed
 - 🏆 Score tracking and leaderboards
@@ -29,20 +29,11 @@ A modern Sudoku game with a clean, Perplexity-inspired design and Playwright tes
 
 ## Screenshots
 
-### Game Board
-![Sudoku Game Board](/public/screenshots/game-screenshot.png)
-
-### Actual Gameplay
-![Actual Gameplay](/public/screenshots/screenshot-2025-03-08T22-10-09-527Z.png)
+### Desktop View
+![Desktop View](/public/screenshots/desktop-view.png)
 
 ### Mobile View
 ![Mobile View](/public/screenshots/mobile-view.png)
-
-### Mobile Gameplay
-![Mobile Gameplay](/public/screenshots/screenshot-2025-03-08T22-18-02-518Z.png)
-
-### Difficulty Levels
-![Difficulty Levels](/public/screenshots/difficulty-levels.png)
 
 **Taking Screenshots:**
 1. Make sure the development server is running: `npm run dev`
