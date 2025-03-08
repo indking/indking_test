@@ -1,15 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSudokuStore } from '../store/sudokuStore';
 
 export const SoundEffects = () => {
   const [isMuted, setIsMuted] = useState(false);
   const { board, isComplete, isValid } = useSudokuStore();
+  const prevBoardRef = useRef<number[][]>(board);
   
   // Load mute preference from localStorage
   useEffect(() => {
-    const savedMute = localStorage.getItem('sudokuMuted');
-    if (savedMute) {
-      setIsMuted(savedMute === 'true');
+    // Only run on client side
+    if (typeof window !== 'undefined') {
+      const savedMute = localStorage.getItem('sudokuMuted');
+      if (savedMute) {
+        setIsMuted(savedMute === 'true');
+      }
     }
   }, []);
   
@@ -17,31 +21,53 @@ export const SoundEffects = () => {
   const toggleMute = () => {
     const newMuted = !isMuted;
     setIsMuted(newMuted);
-    localStorage.setItem('sudokuMuted', newMuted.toString());
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sudokuMuted', newMuted.toString());
+    }
+    
+    // Play a test sound when unmuting
+    if (!newMuted) {
+      playSound('/sounds/click.mp3', 0.2);
+    }
+  };
+  
+  // Helper function to play sounds
+  const playSound = (soundPath: string, volume: number = 0.3) => {
+    if (isMuted || typeof window === 'undefined') return;
+    
+    try {
+      const audio = new Audio(soundPath);
+      audio.volume = volume;
+      audio.play().catch(e => {
+        console.log('Audio play failed:', e);
+      });
+    } catch (error) {
+      console.error('Error playing sound:', error);
+    }
   };
   
   // Play sound when a cell is filled
   useEffect(() => {
-    if (isMuted) return;
+    if (isMuted || typeof window === 'undefined') return;
     
-    // We can't directly listen to cell changes, so we'll use a timeout
-    // to avoid playing sounds during initial board setup
-    const timer = setTimeout(() => {
-      const audio = new Audio('/sounds/click.mp3');
-      audio.volume = 0.3;
-      audio.play().catch(e => console.log('Audio play failed:', e));
-    }, 100);
+    // Compare current board with previous board to detect changes
+    const hasChanged = board.some((row, rowIndex) => 
+      row.some((cell, colIndex) => cell !== prevBoardRef.current[rowIndex][colIndex])
+    );
     
-    return () => clearTimeout(timer);
+    if (hasChanged) {
+      playSound('/sounds/click.mp3');
+    }
+    
+    // Update the previous board reference
+    prevBoardRef.current = board.map(row => [...row]);
   }, [board, isMuted]);
   
   // Play sound when the game is completed
   useEffect(() => {
-    if (isMuted || !isComplete) return;
+    if (isMuted || typeof window === 'undefined' || !isComplete) return;
     
-    const audio = new Audio(isValid ? '/sounds/success.mp3' : '/sounds/error.mp3');
-    audio.volume = 0.5;
-    audio.play().catch(e => console.log('Audio play failed:', e));
+    playSound(isValid ? '/sounds/success.mp3' : '/sounds/error.mp3', 0.5);
   }, [isComplete, isValid, isMuted]);
   
   return (
