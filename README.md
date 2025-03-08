@@ -2,7 +2,7 @@
 
 A modern Sudoku game with a clean, Perplexity-inspired design and Playwright testing.
 
-![Sudoku Game Screenshot](https://via.placeholder.com/800x450.png?text=Sudoku+Game+Screenshot)
+![Sudoku Game Screenshot](/public/screenshots/screenshot-2025-03-08T22-10-09-527Z.png)
 
 ## Features
 
@@ -18,8 +18,14 @@ A modern Sudoku game with a clean, Perplexity-inspired design and Playwright tes
 ### Game Board
 ![Sudoku Game Board](/public/screenshots/game-screenshot.png)
 
+### Actual Gameplay
+![Actual Gameplay](/public/screenshots/screenshot-2025-03-08T22-10-09-527Z.png)
+
 ### Mobile View
 ![Mobile View](/public/screenshots/mobile-view.png)
+
+### Mobile Gameplay
+![Mobile Gameplay](/public/screenshots/screenshot-2025-03-08T22-18-02-518Z.png)
 
 ### Difficulty Levels
 ![Difficulty Levels](/public/screenshots/difficulty-levels.png)
