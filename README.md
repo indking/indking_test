@@ -6,12 +6,26 @@ A modern Sudoku game with a clean, Perplexity-inspired design and Playwright tes
 
 ## Features
 
-- 🎮 Interactive Sudoku game with three difficulty levels
+- 🎮 Interactive Sudoku game with three difficulty levels (Easy, Medium, Hard)
 - 🎨 Clean, modern UI inspired by Perplexity's design aesthetic
 - 🔄 Generate new puzzles with varying difficulty
-- ✅ Validate your solution
+- ✅ Validate your solution with instant feedback
 - 📱 Responsive design for desktop and mobile
 - 🧪 Comprehensive test suite using Playwright
+- 🎯 Intelligent puzzle generation algorithm
+- 🌓 Visual separation of 3x3 blocks for better readability
+- 🔢 Number pad for easy input on both desktop and mobile
+
+## Planned Features
+
+- ⏱️ Game timer to track solving speed
+- 🏆 Score tracking and leaderboards
+- 💾 Save game progress
+- 🎵 Sound effects and background music
+- 🌙 Dark mode support
+- 🔍 Hint system for when you're stuck
+- 🎮 Keyboard navigation support
+- 🎯 Daily challenges with unique puzzles
 
 ## Screenshots
 
